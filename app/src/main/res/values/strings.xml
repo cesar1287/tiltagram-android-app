@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Tiltagram</string>
+
+    <string name="facebook_app_id">241444613029101</string>
+    <string name="fb_login_protocol_scheme">fb241444613029101</string>
 </resources>
