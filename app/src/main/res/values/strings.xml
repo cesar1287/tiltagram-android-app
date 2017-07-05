@@ -3,4 +3,6 @@
 
     <string name="facebook_app_id">241444613029101</string>
     <string name="fb_login_protocol_scheme">fb241444613029101</string>
+    <string name="error_facebook_login_canceled">Login com o Facebook cancelado</string>
+    <string name="error_facebook_login_unknown_error">Erro desconhecido ao fazer login com o Facebook</string>
 </resources>
