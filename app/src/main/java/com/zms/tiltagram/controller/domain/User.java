@@ -4,8 +4,16 @@ import java.util.ArrayList;
 
 public class User {
 
-    String id, name, profilePicture, description;
-    ArrayList<String> following, followers, pics;
+    private String id, facebookId, name, profilePicture, description;
+    private ArrayList<String> following, followers, pics;
+
+    public String getFacebookId() {
+        return facebookId;
+    }
+
+    public void setFacebookId(String facebookId) {
+        this.facebookId = facebookId;
+    }
 
     public String getId() {
         return id;

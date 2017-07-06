@@ -1,10 +1,9 @@
-package com.zms.tiltagram;
+package com.zms.tiltagram.view;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.facebook.CallbackManager;
@@ -14,6 +13,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -23,9 +23,11 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Map;
 
 import com.loopj.android.http.*;
+import com.zms.tiltagram.R;
+import com.zms.tiltagram.controller.domain.User;
+import com.zms.tiltagram.model.UserDAO;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -107,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
     private void processLoginFacebook(LoginResult loginResult){
 
         final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-        progressDialog.setMessage("Processando dados...");
+        progressDialog.setMessage("Processando login...");
         progressDialog.show();
 
         GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -121,11 +123,13 @@ public class LoginActivity extends AppCompatActivity {
                 String first_name = bFacebookData.getString("first_name");
                 String last_name = bFacebookData.getString("last_name");
 
-                String name = first_name + " " + last_name;
+                final String name = first_name + " " + last_name;
 
-                String email = bFacebookData.getString("email");
+                //String email = bFacebookData.getString("email");
 
-                String profilePicture = bFacebookData.getString("profile_pic");
+                final String profilePicture = bFacebookData.getString("profile_pic");
+
+                final String facebookId = bFacebookData.getString("idFacebook");
 
                 AsyncHttpClient client = new AsyncHttpClient();
 
@@ -138,17 +142,25 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
 
-                        progressDialog.dismiss();
-                        Intent irParaATelaPrincipal = new Intent(LoginActivity.this, MainActivity.class);
-                        irParaATelaPrincipal.putExtra("infosFacebook", bFacebookData);
-                        startActivity(irParaATelaPrincipal);
-                        finish();
-
                         try {
                             JSONObject json = new JSONObject(
                                     new String(responseBody));
 
-                            Toast.makeText(LoginActivity.this, json.getString("message"), Toast.LENGTH_SHORT).show();
+                            User user = new User();
+                            user.setId(json.getString("userId"));
+                            user.setFacebookId(facebookId);
+                            user.setName(name);
+                            user.setProfilePicture(profilePicture);
+
+                            UserDAO userDAO = new UserDAO(LoginActivity.this);
+                            if(!userDAO.isUserCreated(user.getId())) {
+                                userDAO.insert(user);
+                                userDAO.close();
+                            }
+
+                            progressDialog.dismiss();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
                         } catch (JSONException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -158,13 +170,15 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
 
+                        LoginManager.getInstance().logOut();
+                        progressDialog.dismiss();
                         Toast.makeText(LoginActivity.this, "Falha", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
         });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location"); // Parâmetros que pedimos ao facebook
+        parameters.putString("fields", "id, first_name, last_name, email"); // Parâmetros que pedimos ao facebook
         request.setParameters(parameters);
         request.executeAsync();
     }
