@@ -4,31 +4,31 @@
     <item
         android:id="@+id/action_home"
         android:enabled="true"
-        android:icon="@drawable/ic_account_box_black_24dp"
+        android:icon="@drawable/ic_home"
         android:title="Home"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_search"
         android:enabled="true"
-        android:icon="@drawable/ic_account_box_black_24dp"
-        android:title="Search"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_magnify"
+        android:title="Procurar"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_picture"
         android:enabled="true"
-        android:icon="@drawable/ic_account_box_black_24dp"
-        android:title="Picture"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_plus_box"
+        android:title="Foto"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_feed"
         android:enabled="true"
-        android:icon="@drawable/ic_account_box_black_24dp"
+        android:icon="@drawable/ic_heart"
         android:title="Feed"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_account"
         android:enabled="true"
-        android:icon="@drawable/ic_account_box_black_24dp"
-        android:title="Account"
+        android:icon="@drawable/ic_account"
+        android:title="Conta"
         app:showAsAction="always" />
 </menu>

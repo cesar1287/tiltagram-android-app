@@ -11,6 +11,6 @@
         android:layout_gravity="center"
         android:id="@+id/action_bar_title"
         android:text="Tiltagram"
-        android:textColor="#FFF"
+        android:textColor="@color/black"
         android:textSize="24sp" />
 </LinearLayout>

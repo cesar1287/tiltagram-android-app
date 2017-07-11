@@ -1,8 +1,11 @@
 package com.zms.tiltagram.view;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -13,6 +16,8 @@ import android.view.MenuItem;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.github.florent37.camerafragment.CameraFragment;
+import com.github.florent37.camerafragment.configuration.Configuration;
 import com.zms.tiltagram.R;
 import com.zms.tiltagram.controller.domain.User;
 import com.zms.tiltagram.model.UserDAO;
@@ -25,7 +30,7 @@ import com.zms.tiltagram.view.fragments.FragmentSearch;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     User user;
 
@@ -35,9 +40,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(AccessToken.getCurrentAccessToken()!=null){
+        if (AccessToken.getCurrentAccessToken() != null) {
             processLoginFacebook(AccessToken.getCurrentAccessToken());
-        }else{
+        } else {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         Fragment selectedFragment = null;
+                        CameraFragment cameraFragment = null;
                         switch (item.getItemId()) {
                             case R.id.action_home:
                                 selectedFragment = FragmentHome.newInstance();
@@ -63,7 +69,19 @@ public class MainActivity extends AppCompatActivity{
                                 selectedFragment = FragmentSearch.newInstance();
                                 break;
                             case R.id.action_picture:
-                                selectedFragment = FragmentPicture.newInstance();
+                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                                    // TODO: Consider calling
+                                    //    ActivityCompat#requestPermissions
+                                    // here to request the missing permissions, and then overriding
+                                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                    //                                          int[] grantResults)
+                                    // to handle the case where the user grants the permission. See the documentation
+                                    // for ActivityCompat#requestPermissions for more details.
+                                    //return TODO;
+                                }else{
+                                    //you can configure the fragment by the configuration builder
+                                    cameraFragment = CameraFragment.newInstance(new Configuration.Builder().build());
+                                }
                                 break;
                             case R.id.action_feed:
                                 selectedFragment = FragmentFeed.newInstance();
@@ -72,9 +90,13 @@ public class MainActivity extends AppCompatActivity{
                                 selectedFragment = FragmentAccount.newInstance();
                                 break;
                         }
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.frame_layout, selectedFragment);
-                        transaction.commit();
+                        if(cameraFragment==null) {
+                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                            transaction.replace(R.id.frame_layout, selectedFragment);
+                            transaction.commit();
+                        }else{
+                            startActivity(new Intent(MainActivity.this, PictureActivity.class));
+                        }
                         return true;
                     }
                 });
